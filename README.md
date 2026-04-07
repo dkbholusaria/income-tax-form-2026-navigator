@@ -62,6 +62,10 @@ Contributions, suggestions, and improvements are welcome.
 * Click **Scan Forms**
 * Select required forms and download
 
+### Download (Executable)
+Download the latest version:  
+https://github.com/dkbholusaria/income-tax-form-2026-navigator/releases/latest
+
 ---
 
 ## Quick Start (run from source)
