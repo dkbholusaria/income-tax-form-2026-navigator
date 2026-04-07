@@ -153,6 +153,4 @@ This is a best-effort utility and may not have active maintenance.
 
 ## Author
 
-CA. Deepak Bholusaria
-DAKSM AND CO LLP
-AI Learrning Guru™
+CA. Deepak Bholusaria | DAKSM AND CO LLP | AI Learrning Guru™
