@@ -112,7 +112,7 @@ The installer creates:
 ## File Structure
 
 ```
-ITFormsDownloader/
+income-tax-form-2026-navigator/
 ├── it_forms_pro.py      ← Main application (GUI + backend)
 ├── create_icon.py       ← Generates app_icon.ico
 ├── app_icon.ico         ← Application icon
