@@ -1,3 +1,6 @@
+![Application Screenshot](AppScreenshots/ITFormsNavigator.png)
+
+
 # Income Tax Form 2026 Navigator
 
 A lightweight desktop utility to simplify discovery and bulk downloading of Income Tax Forms from the official portal
