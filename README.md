@@ -64,6 +64,17 @@ Contributions, suggestions, and improvements are welcome.
 Download the latest version:  
 https://github.com/dkbholusaria/income-tax-form-2026-navigator/releases/latest
 
+
+### Note on Windows Security Prompt
+Since the application is not digitally signed, Windows may show a **“Windows protected your PC”** message.
+
+To proceed:
+1. Click **More info**
+2. Click **Run anyway**
+
+This is expected for independently developed utilities.
+
+
 ---
 
 ## Quick Start (run from source)
