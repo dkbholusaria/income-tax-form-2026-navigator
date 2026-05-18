@@ -12,7 +12,7 @@ Packaging: PyInstaller-ready (single EXE)
 (c) 2026 DAKSM AND CO LLP
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __app_name__ = "Income Tax Form 2026 Navigator"
 __author__   = "CA. Deepak Bholusaria"
 
@@ -30,7 +30,7 @@ from pathlib import Path
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-import requests
+from curl_cffi import requests
 import customtkinter as ctk
 
 # ══════════════════════════════════════════════════════════════
@@ -94,19 +94,18 @@ def ts() -> str:
 # ══════════════════════════════════════════════════════════════
 # BACKEND  (pure requests — no browser engine)
 # ══════════════════════════════════════════════════════════════
-def create_session() -> requests.Session:
-    s = requests.Session()
-    s.headers.update({
-        "User-Agent": USER_AGENT,
-        "Accept-Language": "en-US",
-    })
-    return s
-
-
 def scan_forms(cb) -> list[dict]:
     """Discover all forms via the Liferay Search API."""
-    cb("log", "Connecting to incometaxindia.gov.in …")
-    session = create_session()
+    cb("log", f"Connecting to official portal: {BASE_URL}")
+    
+    headers = {
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Content-Type": "application/json",
+        "Origin": "https://www.incometaxindia.gov.in",
+        "Referer": "https://www.incometaxindia.gov.in/pages/charts-and-tables.aspx?tb=Income-tax%20Rules",
+    }
+    
     forms = []
     page_num = 1
 
@@ -125,7 +124,8 @@ def scan_forms(cb) -> list[dict]:
             }
         }
         try:
-            resp = session.post(SEARCH_API, params=params, json=body, timeout=30)
+            cb("log", f"Querying Search API: {SEARCH_API} (Page {page_num})")
+            resp = requests.post(SEARCH_API, params=params, json=body, headers=headers, impersonate="chrome124", timeout=30)
             resp.raise_for_status()
             data = resp.json()
         except Exception as exc:
@@ -172,12 +172,11 @@ def scan_forms(cb) -> list[dict]:
             break
         page_num += 1
 
-    session.close()
     cb("log", f"Scan complete — {len(forms)} form(s) discovered")
     return forms
 
 
-def download_one_form(form: dict, save_dir: Path, session: requests.Session):
+def download_one_form(form: dict, save_dir: Path):
     """Download a single PDF. Returns a result dict."""
     fno  = form["form_no"]
     desc = form["title"]
@@ -190,10 +189,16 @@ def download_one_form(form: dict, save_dir: Path, session: requests.Session):
     fname = clean_filename(fno, desc)
     fpath = save_dir / fname
 
+    headers = {
+        "Accept": "application/pdf,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.incometaxindia.gov.in/pages/charts-and-tables.aspx?tb=Income-tax%20Rules",
+    }
+
     status, note = "FAILED", ""
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            r = session.get(url, timeout=DL_TIMEOUT)
+            r = requests.get(url, headers=headers, impersonate="chrome124", timeout=DL_TIMEOUT)
             if r.status_code == 200 and len(r.content) > 500:
                 fpath.write_bytes(r.content)
                 status = "OK"
@@ -216,13 +221,12 @@ def download_forms(forms: list[dict], save_dir: str, cb) -> list[dict]:
     total = len(forms)
     cb("log", f"Downloading {total} form(s) to {save_path} …")
 
-    session = create_session()
     results = []
     completed = 0
 
     with ThreadPoolExecutor(max_workers=CONCURRENCY) as pool:
         futures = {
-            pool.submit(download_one_form, f, save_path, session): f
+            pool.submit(download_one_form, f, save_path): f
             for f in forms
         }
         for future in as_completed(futures):
@@ -230,10 +234,8 @@ def download_forms(forms: list[dict], save_dir: str, cb) -> list[dict]:
             results.append(res)
             completed += 1
             tag = "OK " if res["status"] == "OK" else "FAIL"
-            cb("log", f"  [{completed}/{total}] {tag}  {res['form_no']}")
+            cb("log", f"  [{completed}/{total}] {tag}  {res['form_no']} (From: {res['detail_url']})")
             cb("progress", (completed, total))
-
-    session.close()
 
     # Sort results to match input order
     order = {f["form_no"]: i for i, f in enumerate(forms)}
