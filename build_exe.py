@@ -5,7 +5,7 @@ Build Script — IT Forms Downloader 2026
 Cross-platform Python build script using PyInstaller.
 
 Usage:
-  pip install pyinstaller customtkinter requests Pillow
+  pip install pyinstaller customtkinter curl-cffi Pillow
   python build_exe.py
 
 Output:
@@ -23,10 +23,10 @@ def main():
     os.chdir(root)
 
     # 1. Generate icon if missing
-    icon_path = root / "app_icon.ico"
+    icon_path = root / "assets" / "app_icon.ico"
     if not icon_path.exists():
         print("Generating app icon …")
-        subprocess.run([sys.executable, "create_icon.py"], check=True)
+        subprocess.run([sys.executable, str(root / "assets" / "create_icon.py")], check=True)
 
     # 2. Find customtkinter installation path
     import customtkinter
@@ -43,7 +43,7 @@ def main():
         "--icon", str(icon_path),
         f"--add-data={ctk_path}{sep}customtkinter/",
         "--hidden-import=customtkinter",
-        "--hidden-import=requests",
+        "--hidden-import=curl_cffi",
         "--hidden-import=PIL",
         "--hidden-import=PIL._tkinter_finder",
         "--hidden-import=darkdetect",

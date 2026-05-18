@@ -1,5 +1,6 @@
 customtkinter
-requests
+curl-cffi
 Pillow
 playwright
 cryptography
+

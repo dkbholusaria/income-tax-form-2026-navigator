@@ -1,7 +1,6 @@
 # IT Forms Downloader 2026
 
-Professional desktop application for downloading Income Tax Forms from
-[incometaxindia.gov.in](https://www.incometaxindia.gov.in).
+Professional desktop application for discovering and downloading Income Tax Forms from the newly launched official [incometaxindia.gov.in](https://www.incometaxindia.gov.in) portal.
 
 **© 2026 DAKSM AND CO LLP**
 
@@ -12,21 +11,26 @@ Professional desktop application for downloading Income Tax Forms from
 | Feature              | Description                                              |
 |----------------------|----------------------------------------------------------|
 | Save-path selector   | Default `D:\IncomeTaxForms2026`, with Browse button      |
-| Scan / Rescan        | Fetches all 190 forms via Liferay API                    |
+| Scan / Rescan        | Fetches all 190 forms via Liferay Search API             |
 | Select / Deselect    | Click rows to toggle; Select All / Deselect All buttons  |
 | Live filter          | Instant search across form numbers and titles            |
-| Download PDFs        | Parallel downloads with progress bar                     |
+| Download PDFs        | Parallel, stateless, thread-safe downloads with progress |
 | Export CSV           | Save discovered forms list as CSV                        |
 | Open Folder          | Opens the save directory in Explorer                     |
-| Activity Log         | Timestamped, colour-coded log                            |
+| Activity Log         | Transparent, real-time URL and status logger             |
 | Dark / Light mode    | System-aware appearance toggle                           |
 
 ---
 
 ## Quick Start (run from source)
 
+1. Clone or download this repository.
+2. Install the necessary dependencies listed in `requirements.txt`:
 ```bash
-pip install customtkinter requests Pillow
+pip install -r requirements.txt
+```
+3. Run the application:
+```bash
 python it_forms_pro.py
 ```
 
@@ -36,18 +40,18 @@ python it_forms_pro.py
 
 ### Prerequisites
 
+Ensure you have PyInstaller and all dependencies installed:
 ```bash
-pip install pyinstaller customtkinter requests Pillow
+pip install pyinstaller -r requirements.txt
 ```
 
 ### Option A — Python build script (recommended)
-
+Processes app icons automatically and compiles cross-platform:
 ```bash
 python build_exe.py
 ```
 
 ### Option B — Batch file (Windows only)
-
 ```bash
 build_exe.bat
 ```
@@ -58,39 +62,43 @@ Output: `dist\ITFormsDownloader.exe` (~15–20 MB)
 
 ## Create Windows Installer
 
-1. Build the EXE first (see above)
-2. Install [Inno Setup 6](https://jrsoftware.org/isinfo.php)
-3. Open `installer.iss` in Inno Setup Compiler → Build
-4. Find the installer at: `Output\ITFormsDownloader_Setup_1.0.0.exe`
+1. Build the standalone EXE first (see above).
+2. Install [Inno Setup 6](https://jrsoftware.org/isinfo.php).
+3. Open `installer.iss` in the Inno Setup Compiler.
+4. Click **Build** (or run `"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss` in CMD).
+5. Find the completed installer package at: `Output\ITFormsDownloader_Setup_1.1.0.exe`
 
-The installer creates:
-- Start Menu shortcut
-- Desktop shortcut (optional)
-- Standard Windows uninstaller
+The installer sets up:
+- A desktop shortcut and a Start Menu folder.
+- A standard Windows Uninstaller program.
 
 ---
 
 ## File Structure
 
-```
+```text
 ITFormsDownloader/
-├── it_forms_pro.py      ← Main application (GUI + backend)
-├── create_icon.py       ← Generates app_icon.ico
-├── app_icon.ico         ← Application icon
-├── app_icon.png         ← Icon in PNG format
-├── build_exe.py         ← Cross-platform PyInstaller build script
-├── build_exe.bat        ← Windows batch build script
+├── assets/              ← Application icons & creation helper
+│   ├── app_icon.ico
+│   ├── app_icon.png
+│   └── create_icon.py
+├── docs/                ← Documentation & Release logs
+│   └── release_notes_v1.1.0.md
+├── dist/                ← Contains compiled ITFormsDownloader.exe
+├── it_forms_pro.py      ← Main application GUI and backend code
+├── requirements.txt     ← Project dependency specifications
+├── build_exe.py         ← Cross-platform PyInstaller compiler script
+├── build_exe.bat        ← Windows compiler batch script
 ├── installer.iss        ← Inno Setup installer script
-└── README.md            ← This file
+├── LICENSE              ← Application License terms
+└── README.md            ← This file (documentation)
 ```
 
 ---
 
 ## Technical Notes
 
-- **Backend**: Uses plain HTTP `requests` (no browser engine needed).  
-  The app calls the same Liferay Search API that the website's JavaScript uses.
-- **Frontend**: `customtkinter` for modern themed widgets.
-- **Packaging**: PyInstaller bundles everything into a single EXE.
-- **No Playwright needed**: The earlier version required Playwright + Firefox.  
-  This version uses direct HTTP which makes the EXE compact (~15 MB vs ~150 MB).
+* **Stateless WAF Bypass Backend:** Uses standard, stateless HTTP requests via `curl_cffi` to mimic Google Chrome's low-level TLS/SSL and HTTP/2 handshakes (`impersonate="chrome124"`). This completely bypasses the official portal's strict Akamai anti-bot firewall without needing heavy browser engines.
+* **Format Enforcement:** Sets explicit browser headers (`Accept: application/json`) to ensure the server always outputs structured JSON rather than falling back to XML.
+* **Concurrency Thread Safety:** Download threads inside the `ThreadPoolExecutor` perform isolated stateless fetches. This keeps parallel downloading fast, safe, and free from network collisions.
+* **No Playwright / Selenium required:** Bypassing firewalls directly at the connection level keeps the compiled standalone executable exceptionally light (~15 MB).

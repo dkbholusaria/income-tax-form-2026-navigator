@@ -5,7 +5,7 @@ REM  Creates a single-file EXE using PyInstaller
 REM ============================================================
 REM
 REM  Prerequisites (run once):
-REM    pip install pyinstaller customtkinter requests Pillow
+REM    pip install pyinstaller customtkinter curl-cffi Pillow
 REM
 REM  Usage:
 REM    1. Open a Command Prompt in THIS folder
@@ -20,9 +20,9 @@ echo ====================================================
 echo.
 
 REM Generate icon if it doesn't exist
-if not exist "app_icon.ico" (
+if not exist "assets\app_icon.ico" (
     echo Generating app icon ...
-    python create_icon.py
+    python assets\create_icon.py
 )
 
 REM Find customtkinter path for bundling
@@ -37,10 +37,10 @@ pyinstaller ^
     --onefile ^
     --windowed ^
     --name "ITFormsDownloader" ^
-    --icon "app_icon.ico" ^
+    --icon "assets\app_icon.ico" ^
     --add-data "%CTK_PATH%;customtkinter/" ^
     --hidden-import "customtkinter" ^
-    --hidden-import "requests" ^
+    --hidden-import "curl_cffi" ^
     --hidden-import "PIL" ^
     --hidden-import "PIL._tkinter_finder" ^
     it_forms_pro.py

@@ -10,11 +10,11 @@
 ;         "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
 ;
 ;  Output:
-;    Output\ITFormsDownloader_Setup_1.0.0.exe
+;    Output\ITFormsDownloader_Setup_1.1.0.exe
 ; ============================================================
 
 #define MyAppName       "Income Tax Form 2026 Navigator"
-#define MyAppVersion    "1.0.0"
+#define MyAppVersion    "1.1.0"
 #define MyAppPublisher  "CA. Deepak Bholusaria | DAKSM AND CO LLP"
 #define MyAppURL        "https://www.incometaxindia.gov.in"
 #define MyAppExeName    "ITFormsDownloader.exe"
@@ -32,7 +32,7 @@ DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputDir=Output
 OutputBaseFilename=ITFormsDownloader_Setup_{#MyAppVersion}
-SetupIconFile=app_icon.ico
+SetupIconFile=assets\app_icon.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 Compression=lzma2/ultra64
 SolidCompression=yes
@@ -59,7 +59,7 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 Source: "dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Icon file
-Source: "app_icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "assets\app_icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\app_icon.ico"
