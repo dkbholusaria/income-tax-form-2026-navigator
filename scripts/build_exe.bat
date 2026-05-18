@@ -14,6 +14,7 @@ REM    3. Find the EXE in:  dist\ITFormsDownloader.exe
 REM ============================================================
 
 echo.
+cd /d "%~dp0.."
 echo ====================================================
 echo   Building IT Forms Downloader 2026 ...
 echo ====================================================
