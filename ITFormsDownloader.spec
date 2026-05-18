@@ -1,19 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_all
-
-datas = [('C:\\Python\\Lib\\site-packages\\customtkinter', 'customtkinter/')]
-binaries = []
-hiddenimports = ['customtkinter', 'requests', 'PIL', 'PIL._tkinter_finder', 'darkdetect']
-tmp_ret = collect_all('customtkinter')
-datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
 
 a = Analysis(
     ['it_forms_pro.py'],
     pathex=[],
-    binaries=binaries,
-    datas=datas,
-    hiddenimports=hiddenimports,
+    binaries=[],
+    datas=[('C:\\Python\\Lib\\site-packages\\customtkinter', 'customtkinter/')],
+    hiddenimports=['customtkinter', 'requests', 'PIL', 'PIL._tkinter_finder'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -42,5 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['D:\\Project\\ITFormsDownloader\\app_icon.ico'],
+    icon=['app_icon.ico'],
 )
